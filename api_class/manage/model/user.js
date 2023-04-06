@@ -2,6 +2,7 @@ const mongoose = require("mongoose")
 const joi = require('@hapi/joi')
 const config = require("../config")
 const jwt = require('jsonwebtoken')
+const Joi = require("@hapi/joi")
 joi.objectId =require("joi-objectid")(joi)
 
 const userValidator =(data)=>{
@@ -12,39 +13,30 @@ const userValidator =(data)=>{
         _id:joi.objectId(),
         following:joi.array().items(joi.object().keys({
             type:joi.objectId()
-        })).message({
-            "array.base":"following必须为数组"
-        }),
-        avatar_url:joi.string().message({
-            "string.base":"图像地址必须为字符串"
-        }),
-        gender:joi.any().valid("male","female").default("male").message({
-            "any.only":'传入的值无效'
-        }),
+        })),
+        avatar_url:joi.string(),
+        gender:joi.any().valid("male","female").default("male"),
         headline:joi.string().max(100).min(3),
-        location:joi.array().items(joi.string()).message({
-            "array.base":"location 必须是数组"
-        }),
-        business:joi.string().message({
-            "string.base":'business必须为String类型'
-        }),
+        location:joi.array().items(joi.objectId()).error(new Error('location类型为数组')),
+        business:joi.objectId().error(new Error('business必须为String类型')),
         employments:joi.array().items(
             joi.object().keys({
-                company:joi.string(),
-                job:joi.string()
+                company:joi.objectId(),
+                job:joi.objectId()
             })
         ),
         educations:joi.array().items(joi.object().keys({
-            school:joi.string(),
-            major:joi.string(),
+            school:joi.objectId(),
+            major:joi.objectId(), 
             diploma:joi.number().valid(1,2,3,4,5),
             entrance_year:joi.number(),
             grations_year:joi.number()
 
-        }).message({
-            "array.base":"传入数据必须为数组",
-            "any.only":'只能从12345中填入'
-        })),
+        }).error(new Error("传入的数据必须为数组，而且自能选择12345"))),
+        
+        followingTop:joi.array().items(joi.object().keys({ //用户关注的话题
+            type:joi.objectId()
+        })).error(new Error('followingTop必须为数组类型')),
 
     })
 
@@ -93,24 +85,24 @@ const userSchema  = new mongoose.Schema({
         select:false
     },
     location:{
-        type:[{type:String}],
+        type:[{type:mongoose.Schema.Types.ObjectId,ref:"Topic"}],
         select:false
     },
     business:{
-        type:String,
+        type:mongoose.Schema.Types.ObjectId,ref:"Topic",
         select:false
     },
     employments:{
         type:[{
-            company:{type:String},
-            job:{type:String}
+            company:{type:mongoose.Schema.Types.ObjectId,ref:"Topic"},
+            job:{  type:mongoose.Schema.Types.ObjectId,ref:"Topic"}
         }],
         select:false
     },
     educations:{
         type:[{
-            school:{type:String},
-            major:{type:String},
+            school:{ type:mongoose.Schema.Types.ObjectId,ref:"Topic"},
+            major:{type:mongoose.Schema.Types.ObjectId,ref:"Topic"},
             diploma:{type:Number,enum:[1,2,3,4,5]},
             entrance_year:{type:String},
             grations_year:{type:Number}
@@ -121,6 +113,27 @@ const userSchema  = new mongoose.Schema({
         type:[{
             type:mongoose.Schema.Types.ObjectId, //根据id关联到表
             ref:"User"
+        }],
+        select:false
+    },
+    followingTop:{
+        type:[{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'Topic'
+        }],
+        select:false
+    },
+    questionList:{
+        type:[{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'Questions'
+        }],
+        select:false
+    },
+    answerList:{
+        type:[{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'Answer'
         }],
         select:false
     }
