@@ -10,7 +10,7 @@
               class="el-menu-vertical-demo"
               unique-opened
             >
-              <Menu :menuList="store.menuData" />
+              <Menu />
             </el-menu>
           </el-scrollbar>
         </el-aside>

@@ -1,68 +1,41 @@
 <template>
-  <template v-for="(item, index) in menuList" :key="index">
-    <!-- 如果当前菜单有下级,循环下级 -->
-    <el-sub-menu
-      v-if="item.children && item.children.length > 0"
-      :index="item.id"
-    >
-      <template #title>
-        <el-icon class="menu-icon">
-          <!-- 遍历icon -->
-          <component :is="item.icon"></component>
-        </el-icon>
-        <span>{{ item?.label }}</span>
+  <div>
+    <el-menu default-active="2" class="el-menu-vertical-demo" router>
+      <template v-for="(item, index) in store.menuData" :key="item.id">
+        <el-sub-menu
+          :index="item.path"
+          v-if="item?.children && item?.children?.length > 0"
+        >
+          <template #title>
+            <el-icon><component :is="item.icon"></component></el-icon>
+            <span>{{ item.label }}</span>
+          </template>
+          <el-menu-item-group title="Group One">
+            <el-menu-item
+              :index="children.path"
+              v-for="children in item.children"
+              :key="children.id"
+            >
+              <el-icon><component :is="children.icon"></component></el-icon>
+              <span>{{ children.label }}</span>
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
+        <el-menu-item v-else :index="item?.path">
+          <template #title>
+            <el-icon><component :is="item.icon"></component></el-icon>
+            <span>{{ item.label }}</span>
+          </template>
+        </el-menu-item>
       </template>
-
-      <!-- 递归调用自身 -->
-      <Menu :menuList="item.children" :index="item.id"> </Menu>
-    </el-sub-menu>
-
-    <!-- 没有下级 -->
-    <el-menu-item v-else :index="item?.id">
-      <component :is="item?.icon" class="menu-icon"></component>
-      <template #title>{{ item?.label }}</template>
-    </el-menu-item>
-  </template>
+    </el-menu>
+  </div>
 </template>
 
 <script setup>
-// import { defineComponent, onMounted } from 'vue';
-import {
-  Document,
-  Menu as IconMenu,
-  Location,
-  Setting,
-} from "@element-plus/icons-vue";
-import Menu from "./menu.vue";
-const props = defineProps({
-  menuList: {
-    type: Array,
-    default: "",
-  },
-});
-// export default defineComponent({
-//   name: 'MenuItem',
-//   props: ['menuList'],
+import { useDataStore } from "../store/index";
 
-//   components: {
-//     Location,
-//     Setting,
-//     IconMenu,
-//     Document,
-//     Management,
-//     HomeFilled,
-//     UserFilled,
-//   },
-// });
-//
+const store = useDataStore();
 </script>
-<style scoped>
-.el-menu-vertical-demo:not(.el-menu--collapse) {
-  width: 200px;
-  min-height: 400px;
-}
-.menu-icon {
-  width: 24px;
-  height: 24px;
-}
-</style>
+
+<style lang="scss" scoped></style>
