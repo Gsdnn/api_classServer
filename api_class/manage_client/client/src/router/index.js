@@ -1,5 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import { ElMessage } from "element-plus";
+import {useDataStore} from '../store/index'
+
 const routes = [
   {
     path: "/home",
@@ -9,7 +11,8 @@ const routes = [
     children: [
       {
         path: "/questionList",
-        name: "quetion",
+        name: "questionList",
+        meta:{name:'问题列表'},
         component: () => import("../views/questionList.vue"),
       },
       {
@@ -21,17 +24,20 @@ const routes = [
             path: "following",
             name: "following",
             component: () => import("../views/following.vue"),
+            meta:{name:'粉丝列表'}
           },
           {
             path: "topicList",
             name: "topicList",
             component: () => import("../views/topicList.vue"),
+            meta:{name:'话题列表'}
           },
         ],
       },
       {
         path: "/topics",
         name: "topics",
+        meta:{name:'话题'},
         component: () => import("../views/topics.vue"),
       },
     ],
@@ -47,24 +53,27 @@ const routes = [
   },
 ];
 
-const router = createRouter({
+const  router = createRouter({
   history: createWebHashHistory(),
   routes,
 });
 
-// router.beforeEach((to,from,next)=>{
-//   const token = localStorage.getItem('token')
-//   console.log(to.path)
-//   if(!token && to.path.startsWith('/login')){
-//     next()
-//   }else if(!token && !to.path.startsWith('/login')){
-//     ElMessage.error("请登入")
-//     next('/login')
-//   }else if(to.path.startsWith('/login')){
-//     localStorage.removeItem('token')
-//   }
-//   next()
+router.beforeEach((to,from,next)=>{
+  const token = localStorage.getItem('token')
+  // console.log(to)
+  const {path,meta} = to
+  useDataStore().setBreadcrumb({path,name:meta.name})
+  useDataStore().getRoute(to.path)
+  if(!token && to.path.startsWith('/login')){
+    next()
+  }else if(!token && !to.path.startsWith('/login')){
+    ElMessage.error("请登入")
+    next('/login')
+  }else if(to.path.startsWith('/login')){
+    localStorage.removeItem('token')
+  }
+  next()
 
-// })
+})
 
 export default router;

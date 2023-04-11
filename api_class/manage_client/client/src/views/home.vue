@@ -15,7 +15,26 @@
           </el-scrollbar>
         </el-aside>
         <el-container>
-          <el-main><router-view /></el-main>
+          <el-main>
+            <el-tabs
+              v-model="editableTabsValue"
+              type="card"
+              closable="true"
+              class="demo-tabs"
+              @edit="handleTabsEdit"
+              @tab-click="handeltabs"
+            >
+              <el-tab-pane
+                v-for="item in editableTabs"
+                :key="item.name"
+                :label="item.name"
+                :name="item.path"
+              >
+              </el-tab-pane>
+            </el-tabs>
+
+            <router-view />
+          </el-main>
           <el-footer>Footer</el-footer>
         </el-container>
       </el-container>
@@ -24,10 +43,28 @@
 </template>
 
 <script setup>
+import { ref, onMounted, reactive, computed } from "vue";
 import { Menu as IconMenu, Message, Setting } from "@element-plus/icons-vue";
 import Menu from "../components/menu.vue";
 import { useDataStore } from "../store/index";
+import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 const store = useDataStore();
+const router = useRouter();
+const editableTabsValue = ref("");
+const inputVisible = ref(false);
+const editableTabs = ref(store.breadcrumbList);
+const handleTabsEdit = (action) => {
+  store.removeBreadcrumb(action);
+};
+const handeltabs = (action) => {
+  console.log("点击", action.paneName);
+  router.push({ path: action.paneName });
+};
+editableTabsValue.value = computed(() => {
+  return store.currentPath;
+});
+onMounted(() => {});
 </script>
 
 <style lang="scss" scoped>
@@ -45,7 +82,10 @@ const store = useDataStore();
     justify-content: center;
   }
   .el-main {
-    background-color: red;
+    .tag .el-tag {
+      margin-left: 10px;
+      margin-top: -20px;
+    }
   }
 }
 body {
