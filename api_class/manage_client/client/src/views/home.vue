@@ -44,8 +44,11 @@ const store = useDataStore();
     align-items: center;
     justify-content: center;
   }
-  .el-main {
-    background-color: red;
+  .el-footer {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 body {
