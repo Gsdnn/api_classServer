@@ -36,6 +36,9 @@
 import { useDataStore } from "../store/index";
 
 const store = useDataStore();
+const handel = (path) => {
+  console.log(path);
+};
 </script>
 
 <style lang="scss" scoped></style>

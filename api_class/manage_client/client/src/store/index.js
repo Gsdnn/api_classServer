@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { login as loginApi } from "../api/login";
 import router from "../router";
+import { useRoute } from "vue-router";
 import {
   Document,
   Menu as IconMenu,
@@ -13,6 +14,9 @@ export const useDataStore = defineStore("useData", {
   state: () => {
     return {
       token: "",
+      breadcrumbList:[],
+      breadcrumbnames:[],
+      currentPath:'',
       menuData: [
         {
           id: "1",
@@ -61,6 +65,26 @@ export const useDataStore = defineStore("useData", {
     };
   },
   actions: {
+    setBreadcrumb(item){
+        const index = this.breadcrumbList.findIndex(v=>{
+            return v.name==item.name
+        })
+        if(index==-1){
+            this.breadcrumbList.push(item)
+           this.breadcrumbnames.push(item.name) 
+        }
+       
+    },
+    removeBreadcrumb(action){
+        const index = this.breadcrumbList.findIndex(v=>{
+            return v.path==action
+        })
+        this.breadcrumbList.splice(index,1)
+    },
+    getRoute(path){
+        this.currentPath = path
+        console.log(this.currentPath)
+    },
     getToken() {
       this.token = localStorage.getItem("token");
     },
@@ -73,12 +97,18 @@ export const useDataStore = defineStore("useData", {
         .then((res) => {
           if (res.code == 200) {
             this.setToken(res.authorization.token);
-            router.push({ path: "/" });
+            router.push({ path: "/home" });
           }
         })
         .catch(() => {
           localStorage.removeItem("token");
         });
     },
+   
   },
+  getters:{
+    getRouter:(state)=>{
+       
+    }
+}
 });
