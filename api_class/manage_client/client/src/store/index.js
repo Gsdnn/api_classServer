@@ -69,21 +69,23 @@ export const useDataStore = defineStore("useData", {
         const index = this.breadcrumbList.findIndex(v=>{
             return v.name==item.name
         })
-        if(index==-1){
+        if(index==-1 && item.name){
             this.breadcrumbList.push(item)
            this.breadcrumbnames.push(item.name) 
         }
-       
+        localStorage.setItem('breadcrumbList',JSON.stringify(this.breadcrumbList))
     },
     removeBreadcrumb(action){
         const index = this.breadcrumbList.findIndex(v=>{
             return v.path==action
         })
         this.breadcrumbList.splice(index,1)
+        localStorage.setItem('breadcrumbList',JSON.stringify(this.breadcrumbList))
     },
     getRoute(path){
         this.currentPath = path
-        console.log(this.currentPath)
+    
+
     },
     getToken() {
       this.token = localStorage.getItem("token");

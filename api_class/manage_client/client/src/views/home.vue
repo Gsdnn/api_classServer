@@ -17,7 +17,7 @@
         <el-container>
           <el-main>
             <el-tabs
-              v-model="editableTabsValue"
+              :modelValue="editableTabsValue"
               type="card"
               closable="true"
               class="demo-tabs"
@@ -55,13 +55,15 @@ const editableTabsValue = ref("");
 const inputVisible = ref(false);
 const editableTabs = ref(store.breadcrumbList);
 const handleTabsEdit = (action) => {
+  // console.log("删除", action);
   store.removeBreadcrumb(action);
 };
 const handeltabs = (action) => {
-  console.log("点击", action.paneName);
+  // console.log("点击", action.paneName);
   router.push({ path: action.paneName });
 };
 editableTabsValue.value = computed(() => {
+  // console.log("store.currentPath", store.currentPath);
   return store.currentPath;
 });
 onMounted(() => {});
